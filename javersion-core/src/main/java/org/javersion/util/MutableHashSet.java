@@ -21,7 +21,7 @@ public class MutableHashSet<E> extends AbstractTrieSet<E, MutableHashSet<E>> {
     
     private final Thread owner = Thread.currentThread();
     
-    private UpdateContext<Entry<E>> updateContext = new UpdateContext<>(32);
+    private UpdateContext<Entry<E>> updateContext = new UpdateContext<Entry<E>>(32);
     
     private Node<E, Entry<E>> root;
     
@@ -39,7 +39,7 @@ public class MutableHashSet<E> extends AbstractTrieSet<E, MutableHashSet<E>> {
     public PersistentHashSet<E> toPersistentSet() {
         verifyThread();
         updateContext.commit();
-        return new PersistentHashSet<>(root, size);
+        return new PersistentHashSet<E>(root, size);
     }
 
     private void verifyThread() {

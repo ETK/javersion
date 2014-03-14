@@ -88,7 +88,7 @@ public abstract class AbstractTrieSet<E, S extends AbstractTrieSet<E, S>> extend
     }
     
     protected UpdateContext<Entry<E>> updateContext(int expectedSize, Merger<Entry<E>> merger) {
-        return new UpdateContext<>(expectedSize, merger);
+        return new UpdateContext<Entry<E>>(expectedSize, merger);
     }
 
     public boolean contains(Object o) {

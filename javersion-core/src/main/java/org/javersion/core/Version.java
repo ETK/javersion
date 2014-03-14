@@ -106,7 +106,7 @@ public class Version<K, V> {
         }
         
         public Version<K, V> build() {
-            return new Version<>(this);
+            return new Version<K,V>(this);
         }
         
     }

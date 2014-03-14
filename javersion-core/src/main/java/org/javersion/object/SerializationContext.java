@@ -33,7 +33,7 @@ public abstract class SerializationContext<V> {
     
     private final Map<PropertyPath, V> properties = Maps.newHashMap();
 
-    private final Deque<QueueItem<PropertyPath, Object>> queue = new ArrayDeque<>();
+    private final Deque<QueueItem<PropertyPath, Object>> queue = new ArrayDeque<QueueItem<PropertyPath, Object>>();
     
     private final IdentityHashMap<Object, PropertyPath> objects = Maps.newIdentityHashMap();
     

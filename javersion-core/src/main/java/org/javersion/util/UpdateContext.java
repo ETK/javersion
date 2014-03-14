@@ -68,7 +68,7 @@ public final class UpdateContext<T> implements Merger<T> {
         this(expectedUpdates, null);
     }
     public UpdateContext(int expectedUpdates, Merger<T> merger) {
-        this.context = new UncommittedContext<>(expectedUpdates, merger);
+        this.context = new UncommittedContext<T>(expectedUpdates, merger);
     }
     public void merger(Merger<T> merger) {
         context.merger = merger;

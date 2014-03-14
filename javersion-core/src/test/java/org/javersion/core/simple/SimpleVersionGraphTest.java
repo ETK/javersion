@@ -242,7 +242,7 @@ public class SimpleVersionGraphTest {
                     Multimaps.transformValues(merge.conflicts, merge.getVersionPropertyValue), 
                     equalTo(expectation.expectedConflicts));
         } catch (RuntimeException e) {
-            throw new AssertionError(title("merge", revision, expectation), e);
+            throw new AssertionError(title("merge", revision, expectation));
         }
     }
     
@@ -308,7 +308,6 @@ public class SimpleVersionGraphTest {
         return new VersionExpectation(title);
     }
 
-    @SafeVarargs
     public static <T> Set<T> setOf(T... revs) {
         return ImmutableSet.copyOf(revs);
     }

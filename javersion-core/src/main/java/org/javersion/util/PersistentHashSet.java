@@ -50,7 +50,7 @@ public class PersistentHashSet<E> extends AbstractTrieSet<E, PersistentHashSet<E
         if (newRoot == root) {
             return this;
         }
-        return new PersistentHashSet<>(newRoot, newSize);
+        return new PersistentHashSet<E>(newRoot, newSize);
     }
 
     @Override

@@ -36,7 +36,6 @@ public abstract class ObjectTypeBuilder<R, B extends ObjectTypeBuilder<R, B>> {
         alias = Check.notNull(root.getCanonicalName(), "root.getCanonicalName()");
     }
     
-    @SafeVarargs
     public final B havingSubClasses(Class<? extends R>... subClasses) {
         return havingSubClasses(ImmutableList.copyOf(subClasses));
     }

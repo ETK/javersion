@@ -27,7 +27,7 @@ public abstract class AbstractMutableMapTest extends AbstractCollectionTest {
         try {
             assertInsertAndDelete(emptyMap(), randoms(500));
         } catch (Exception e) {
-            throw new AssertionError(DESC, e);
+            throw new AssertionError(DESC);
         }
     }
     

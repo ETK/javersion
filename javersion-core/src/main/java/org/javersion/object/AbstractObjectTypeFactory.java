@@ -80,9 +80,11 @@ public abstract class AbstractObjectTypeFactory<V>
         return targetSchemaPath != null && !targetSchemaPath.equals(path);
     }
 
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private ValueType<V> describeReferenceType(DescribeContext<V> context) {
         context.describe(targetSchemaPath, new ValueMappingKey(context.getCurrentType()));
-        return new ReferenceType<>(idMapper, targetSchemaPath.parent, stringType);
+        return new ReferenceType(idMapper, targetSchemaPath.parent, stringType);
     }
 
     private ValueType<V> describeEntityType(DescribeContext<V> context) {

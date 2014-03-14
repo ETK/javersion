@@ -57,7 +57,7 @@ public abstract class AbstractValueTypes<V> implements ValueTypes<V> {
         }
         
         public <R> HierarchyBuilder<R> withClass(Class<R> root) {
-            return new HierarchyBuilder<>(root);
+            return new HierarchyBuilder<R>(root);
         }
 
         public ValueTypes<V> build() {

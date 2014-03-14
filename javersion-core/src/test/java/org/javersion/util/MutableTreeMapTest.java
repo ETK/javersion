@@ -4,7 +4,7 @@ public class MutableTreeMapTest extends AbstractMutableMapTest {
 
     @Override
     protected MutableMap<Integer, Integer> emptyMap() {
-        return new MutableTreeMap<>();
+        return new MutableTreeMap<Integer, Integer>();
     }
 
     @Override

@@ -81,7 +81,7 @@ public abstract class AbstractPersistentMapTest<M extends PersistentMap<Integer,
         try {
             assertInsertAndDelete(randoms(500));
         } catch (AssertionError e) {
-            throw new AssertionError(DESC, e);
+            throw new AssertionError(DESC);
         }
     }
     
@@ -108,7 +108,7 @@ public abstract class AbstractPersistentMapTest<M extends PersistentMap<Integer,
         try {
             assertBulkInsert(randoms(300));
         } catch (AssertionError e) {
-            throw new AssertionError(DESC, e);
+            throw new AssertionError(DESC);
         }
     }
     
@@ -242,7 +242,7 @@ public abstract class AbstractPersistentMapTest<M extends PersistentMap<Integer,
     @Test(expected=IllegalStateException.class)
     public void Edit_MutableMap_From_Another_Thread() throws Throwable {
         final MutableMap<Integer, Integer> map = emptyMap().toMutableMap();
-        final AtomicReference<Throwable> exception = new AtomicReference<>();
+        final AtomicReference<Throwable> exception = new AtomicReference<Throwable>();
 
         final CountDownLatch countDown = new CountDownLatch(1);
         new Thread() {
@@ -279,7 +279,7 @@ public abstract class AbstractPersistentMapTest<M extends PersistentMap<Integer,
     
     protected void assertInsertAndDelete(List<Integer> ints) {
         PersistentMap<Integer, Integer> map = emptyMap();
-        List<PersistentMap<Integer, Integer>> maps = new ArrayList<>(ints.size());
+        List<PersistentMap<Integer, Integer>> maps = new ArrayList<PersistentMap<Integer, Integer>>(ints.size());
         for (Integer i : ints) {
             map = map.assoc(i, i);
             maps.add(map);

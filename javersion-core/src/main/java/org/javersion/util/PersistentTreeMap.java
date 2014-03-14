@@ -95,12 +95,12 @@ public class PersistentTreeMap<K, V> extends AbstractTreeMap<K, V, PersistentTre
 
     @Override
     public MutableTreeMap<K, V> toMutableMap() {
-        return new MutableTreeMap<>(comparator, root, size);
+        return new MutableTreeMap<K,V>(comparator, root, size);
     }
 
     @Override
     public Map<K, V> asMap() {
-        return new ImmutableMap<>(this);
+        return new ImmutableMap<K,V>(this);
     }
 
     @SuppressWarnings("unchecked")

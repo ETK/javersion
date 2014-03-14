@@ -14,7 +14,7 @@ public abstract class AbstractCollectionTest {
     protected static final String DESC = "Random(" + RANDOM_SEED + ")";
 
     protected List<Integer> ascending(int size) {
-        List<Integer> ints = new ArrayList<>(size);
+        List<Integer> ints = new ArrayList<Integer>(size);
         for (int i=0; i < size; i++) {
             ints.add(i);
         }
@@ -22,7 +22,7 @@ public abstract class AbstractCollectionTest {
     }
 
     protected List<Integer> descending(int size) {
-        List<Integer> ints = new ArrayList<>(size);
+        List<Integer> ints = new ArrayList<Integer>(size);
         for (int i=size; i > 0; i--) {
             ints.add(i);
         }
@@ -35,7 +35,7 @@ public abstract class AbstractCollectionTest {
         for (int i=0; i < size; i++) {
             ints.add(random.nextInt());
         }
-        return new ArrayList<>(ints);
+        return new ArrayList<Integer>(ints);
     }
 
 }

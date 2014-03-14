@@ -89,7 +89,7 @@ public abstract class AbstractHashMap<K, V, This extends AbstractHashMap<K, V, T
     }
     
     protected UpdateContext<Map.Entry<K, V>> updateContext(int expectedSize, Merger<Map.Entry<K, V>> merger) {
-        return new UpdateContext<>(expectedSize, merger);
+        return new UpdateContext<Map.Entry<K, V>>(expectedSize, merger);
     }
 
     

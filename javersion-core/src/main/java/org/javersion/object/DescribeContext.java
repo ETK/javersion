@@ -36,7 +36,7 @@ public class DescribeContext<V> {
     
     private final ValueTypes<V> valueTypes;
     
-    private final Deque<QueueItem<SubPath, ValueMappingKey>> stack = new ArrayDeque<>();
+    private final Deque<QueueItem<SubPath, ValueMappingKey>> stack = new ArrayDeque<QueueItem<SubPath, ValueMappingKey>>();
 
     
     private Map<PropertyPath, ValueMappingKey> pathMappings;
@@ -62,7 +62,7 @@ public class DescribeContext<V> {
         
         pathMappings.put(PropertyPath.ROOT, mappingKey);
         ValueType<V> valueType = createValueType(mappingKey);
-        rootMapping = new RootMapping<>(valueType, unmodifiableMap(typeMappings));
+        rootMapping = new RootMapping<V>(valueType, unmodifiableMap(typeMappings));
         registerMapping(currentItem, rootMapping);
 
         processSubMappings();

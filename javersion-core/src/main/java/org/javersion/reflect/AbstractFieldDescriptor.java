@@ -40,8 +40,10 @@ public abstract class AbstractFieldDescriptor<
     public Object get(Object obj) {
         try {
             return field.get(obj);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
+        } catch (IllegalArgumentException e) {
             throw new ReflectionException(e);
+        } catch (IllegalAccessException e) {
+          throw new ReflectionException(e);
         }
     }
     
@@ -52,7 +54,9 @@ public abstract class AbstractFieldDescriptor<
     public void set(Object obj, Object value) {
         try {
             field.set(obj, value);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
+        } catch (IllegalArgumentException e) {
+            throw new ReflectionException(e);
+        } catch (IllegalAccessException e) {
             throw new ReflectionException(e);
         }
     }

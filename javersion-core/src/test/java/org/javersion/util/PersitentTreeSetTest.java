@@ -31,7 +31,7 @@ public class PersitentTreeSetTest {
     private static final Random RANDOM = new Random(2007);
     
     private Set<Integer> randoms(int count) {
-        Set<Integer> set = new LinkedHashSet<>();
+        Set<Integer> set = new LinkedHashSet<Integer>();
         for (int i=0; i < count; i++) {
             set.add(RANDOM.nextInt());
         }
@@ -40,7 +40,7 @@ public class PersitentTreeSetTest {
     
     @Test
     public void Immutability_On_Conj_And_Disj() {
-        List<PersistentTreeSet<Integer>> sets = new ArrayList<>();
+        List<PersistentTreeSet<Integer>> sets = new ArrayList<PersistentTreeSet<Integer>>();
         Set<Integer> ints = randoms(1234);
         PersistentTreeSet<Integer> set = PersistentTreeSet.empty();
         sets.add(set);

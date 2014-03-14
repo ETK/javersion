@@ -110,7 +110,9 @@ public final class VersionNode<K, V, T extends Version<K, V>> implements Compara
 
     @Override
     public int compareTo(VersionNode<K, V, T> o) {
-        return Long.compare(getRevision(), o.getRevision());
+        //return Long.compare(getRevision(), o.getRevision());
+      return (int)(getRevision() - o.getRevision());
+        
     }
     
     @Override
