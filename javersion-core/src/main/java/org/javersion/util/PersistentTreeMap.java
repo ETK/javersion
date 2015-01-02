@@ -17,8 +17,9 @@ package org.javersion.util;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Map.Entry;
 
-public class PersistentTreeMap<K, V> extends AbstractTreeMap<K, V, PersistentTreeMap<K, V>> implements PersistentMap<K, V> {
+public class PersistentTreeMap<K, V> extends AbstractTreeMap<K, V, PersistentTreeMap<K, V>> implements PersistentSortedMap<K, V> {
     
     @SuppressWarnings("rawtypes")
     public static final PersistentTreeMap EMPTY = new PersistentTreeMap();
@@ -116,6 +117,16 @@ public class PersistentTreeMap<K, V> extends AbstractTreeMap<K, V, PersistentTre
 
     public String toString() {
         return root == null ? "NIL" : root.toString();
+    }
+
+    @Override
+    public Entry<K, V> getFirstEntry() {
+        return findMin(root);
+    }
+
+    @Override
+    public Entry<K, V> getLastEntry() {
+        return findMax(root);
     }
 
 }

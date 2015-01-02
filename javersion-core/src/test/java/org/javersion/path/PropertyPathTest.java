@@ -18,6 +18,7 @@ package org.javersion.path;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.javersion.path.PropertyPath.ROOT;
@@ -26,6 +27,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
+import java.util.List;
 
 import org.javersion.path.PropertyPath.SubPath;
 import org.junit.Test;
@@ -132,6 +134,13 @@ public class PropertyPathTest {
         PropertyPath emptyIndex = ROOT.index("");
         assertThat(emptyIndex.toSchemaPath(), sameInstance(emptyIndex));
     }
+
+    public void Full_Path() {
+        List<SubPath> fullPath = children_0_name().getFullPath();
+        assertThat(fullPath, hasSize(3));
+        assertThat(fullPath.get(0), equalTo(children));
+        assertThat(fullPath.get(0), equalTo((PropertyPath) children_0()));
+    }
     
     public static PropertyPath _0 = ROOT.index("0");
     
@@ -156,5 +165,4 @@ public class PropertyPathTest {
     public static SubPath children_0_name() {
         return children_0().property("name");
     }
-
 }

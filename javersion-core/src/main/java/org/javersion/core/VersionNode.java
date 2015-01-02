@@ -15,106 +15,68 @@
  */
 package org.javersion.core;
 
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
-import org.javersion.util.Check;
-import org.javersion.util.Merger;
-import org.javersion.util.MutableHashMap;
-import org.javersion.util.PersistentHashMap;
-import org.javersion.util.PersistentHashSet;
+import org.javersion.util.MutableSortedMap;
+import org.javersion.util.PersistentSortedMap;
 
 import com.google.common.collect.ImmutableSet;
 
-public final class VersionNode<K, V, T extends Version<K, V>> implements Comparable<VersionNode<K, V, T>> {
+public final class VersionNode<K, V, T extends Version<K, V>> extends Merge<K, V> {
 
-    private final Merger<Entry<K, VersionProperty<V>>> merger;
-    
-    private static <K, V> Merger<Entry<K, VersionProperty<V>>> newMerger() {
-        return new Merger<Entry<K, VersionProperty<V>>>() {
-
-            @Override
-            public void insert(Entry<K, VersionProperty<V>> newEntry) {
-            }
-
-            @Override
-            public boolean merge(
-                    Entry<K, VersionProperty<V>> oldEntry,
-                    Entry<K, VersionProperty<V>> newEntry) {
-                return oldEntry.getValue().revision < newEntry.getValue().revision ? true : false;
-            }
-
-            @Override
-            public void delete(Entry<K, VersionProperty<V>> oldEntry) {
-                throw new UnsupportedOperationException();
-            }
-
-        };
-    }
-    
     public final T version;
-    
-    public final Set<VersionNode<K, V, T>> parents;
-    
-    public final VersionNode<K, V, T> previous;
 
-    public final PersistentHashMap<K, VersionProperty<V>> allProperties;
-    
-    public final PersistentHashSet<Long> allRevisions;
+    public final PersistentSortedMap<BranchAndRevision, VersionNode<K, V, T>> heads;
 
-    public VersionNode(VersionNode<K, V, T> previous, T version, Set<VersionNode<K, V, T>> parents) {
-        Check.notNull(version, "version");
-        Check.notNull(parents, "parents");
+    public VersionNode(T version, Iterable<VersionNode<K, V, T>> parents, PersistentSortedMap<BranchAndRevision, VersionNode<K, V, T>> heads) {
+        super(new MergeBuilder<K, V>(toMergeNodes(parents)).overwrite(version));
 
-        if (previous != null && version.revision <= previous.getRevision()) {
-            throw new IllegalVersionOrderException(previous.getRevision(), version.revision);
-        }
-
-        this.previous = previous;
         this.version = version;
-        this.parents = ImmutableSet.copyOf(parents);
-        
-        Iterator<VersionNode<K, V, T>> iter = parents.iterator();
-        
-        if (!iter.hasNext()) {
-            this.allRevisions = new PersistentHashSet<Long>().conj(version.revision);
-            this.allProperties = PersistentHashMap.copyOf(version.getVersionProperties());
-            this.merger = newMerger();
-        } else {
-            VersionNode<K, V, T> parent = iter.next();
-            this.merger = parent.merger;
-            PersistentHashSet<Long> revisions = parent.allRevisions;
-            MutableHashMap<K, VersionProperty<V>> properties = parent.allProperties.toMutableMap();
-            
-            while (iter.hasNext()) {
-                parent = iter.next();
-                revisions = revisions.conjAll(parent.allRevisions);
-                properties.mergeAll(parent.allProperties, merger);
-            }
-            properties.putAll(version.getVersionProperties());
 
-            this.allRevisions = revisions.conj(version.revision);
-            this.allProperties = properties.toPersistentMap();
+        MutableSortedMap<BranchAndRevision, VersionNode<K, V, T>> mutableHeads = heads.toMutableMap();
+        for (VersionNode<K, V, T> parent : parents) {
+            if (parent.version.branch.equals(version.branch)) {
+                mutableHeads.remove(new BranchAndRevision(parent));
+            }
         }
+        mutableHeads.put(new BranchAndRevision(this), this);
+        this.heads = mutableHeads.toPersistentMap();
     }
-    
-    public long getRevision() {
+
+    public Revision getRevision() {
         return version.revision;
     }
-    
+
+    public String getBranch() {
+        return version.branch;
+    }
+
     public Map<K, VersionProperty<V>> getVersionProperties() {
         return version.getVersionProperties();
     }
 
     @Override
-    public int compareTo(VersionNode<K, V, T> o) {
-        return Long.compare(getRevision(), o.getRevision());
+    public Set<Revision> getMergeHeads() {
+        return ImmutableSet.of(version.revision);
     }
-    
+
+    @Override
+    public int hashCode() {
+        return version.revision.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj == this;
+    }
+
     @Override
     public String toString() {
         return version.toString();
     }
+
+    @Override
+    protected void setMergeHeads(Set<Revision> heads) {}
+
 }

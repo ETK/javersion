@@ -40,7 +40,13 @@ public interface PersistentMap<K, V> extends Iterable<Entry<K, V>> {
 
     boolean containsKey(Object key);
 
+    Iterable<K> keys();
+    
+    Iterable<V> values();
+    
     int size();
+    
+    boolean isEmpty();
     
     MutableMap<K, V> toMutableMap();
     

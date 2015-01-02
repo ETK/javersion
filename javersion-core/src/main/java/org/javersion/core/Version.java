@@ -15,101 +15,123 @@
  */
 package org.javersion.core;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+import static com.google.common.collect.ImmutableSet.copyOf;
 import static com.google.common.collect.Maps.newLinkedHashMap;
+import static com.google.common.collect.Maps.transformValues;
 import static java.util.Collections.unmodifiableMap;
+import static org.javersion.util.Check.notNull;
 
 import java.util.Map;
 import java.util.Set;
 
-import org.javersion.util.Check;
-
 import com.google.common.base.Function;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 
 public class Version<K, V> {
-    
+
     public static final String DEFAULT_BRANCH = "default";
-    
-    private Function<V, VersionProperty<V>> toVersionProperties = new Function<V, VersionProperty<V>>() {
+
+    private final Function<V, VersionProperty<V>> toVersionProperties = new Function<V, VersionProperty<V>>() {
 
         @Override
         public VersionProperty<V> apply(V input) {
             return new VersionProperty<V>(revision, input);
         }
-        
+
     };
 
-    public final long revision;
-    
-    public final String branch;
-	
-    public final Set<Long> parentRevisions;
+    public final Revision revision;
 
-    public final Map<K, V> properties;
-    
+    public final String branch;
+
+    public final Set<Revision> parentRevisions;
+
+    public final Map<K, V> changeset;
+
     public final VersionType type;
-    
-    protected Version(Builder<K, V> builder) {
+
+    protected Version(Builder<K, V, ?> builder) {
         this.revision = builder.revision;
         this.branch = builder.branch;
         this.type = builder.type;
-        this.parentRevisions = ImmutableSet.copyOf(builder.parentRevisions);
-        this.properties = unmodifiableMap(newLinkedHashMap(builder.properties));
+        this.parentRevisions = copyOf(builder.parentRevisions);
+        this.changeset = unmodifiableMap(newLinkedHashMap(builder.changeset));
     }
-    
+
     public Map<K, VersionProperty<V>> getVersionProperties() {
-        return Maps.transformValues(properties, toVersionProperties);
+        return transformValues(changeset, toVersionProperties);
     }
-    
+
+    @Override
     public String toString() {
-        return "#" + revision;
+        return toStringHelper(this)
+                .add("revision", revision)
+                .add("branch", branch)
+                .add("parentRevisions", parentRevisions)
+                .add("type", type)
+                .add("changeset", changeset)
+                .toString();
     }
 
-    public static class Builder<K, V> {
+    public static class Builder<K, V, B extends Builder<K, V, B>> {
 
-        private static Set<Long> EMPTY_PARENTS = ImmutableSet.of();
-        
-        private final long revision;
-        
-        private VersionType type = VersionType.NORMAL;
+        private static final Set<Revision> EMPTY_PARENTS = ImmutableSet.of();
 
-        private String branch = DEFAULT_BRANCH;
-        
-        private Set<Long> parentRevisions = EMPTY_PARENTS;
+        protected final Revision revision;
 
-        private Map<K, V> properties = ImmutableMap.of();
+        protected VersionType type = VersionType.NORMAL;
 
-        public Builder(long revision) {
+        protected String branch = DEFAULT_BRANCH;
+
+        protected Set<Revision> parentRevisions = EMPTY_PARENTS;
+
+        protected Map<K, V> changeset = ImmutableMap.of();
+
+        public Builder() {
+            this(new Revision());
+        }
+
+        public Builder(Revision revision) {
             this.revision = revision;
         }
 
-        public Builder<K, V> type(VersionType versionType) {
-            this.type = Check.notNull(versionType, "type");
-            return this;
+        public B type(VersionType versionType) {
+            this.type = notNull(versionType, "type");
+            return self();
         }
 
-        public Builder<K, V> branch(String branch) {
-            this.branch = Check.notNull(branch, "branch");
-            return this;
+        public B branch(String branch) {
+            this.branch = notNull(branch, "branch");
+            return self();
         }
 
-        public Builder<K, V> parents(Set<Long> parentRevisions) {
-            this.parentRevisions = Check.notNull(parentRevisions, "parentRevisions");
-            return this;
+        public B parents(Revision... parentRevisions) {
+            return parents(copyOf(parentRevisions));
         }
 
-        public Builder<K, V> properties(Map<K, V> properties) {
-            this.properties = Check.notNull(properties, "properties");
-            return this;
+        public B parents(Set<Revision> parentRevisions) {
+            this.parentRevisions = notNull(parentRevisions, "parentRevisions");
+            return self();
         }
-        
+
+        public B changeset(Map<K, V> changeset) {
+            this.changeset = notNull(changeset, "changeset");
+            return self();
+        }
+
+        @SuppressWarnings("unchecked")
+        protected B self() {
+            return (B) this;
+        }
+
         public Version<K, V> build() {
             return new Version<>(this);
         }
-        
+
     }
-    
+
 }
 

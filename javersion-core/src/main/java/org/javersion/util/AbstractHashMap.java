@@ -24,8 +24,11 @@ import java.util.Map;
 import org.javersion.util.AbstractHashMap.Entry;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 
-public abstract class AbstractHashMap<K, V, This extends AbstractHashMap<K, V, This>> extends AbstractHashTrie<K, Entry<K,V>, AbstractHashMap<K, V, This>> {
+public abstract class AbstractHashMap<K, V, This extends AbstractHashMap<K, V, This>> 
+        extends AbstractHashTrie<K, Entry<K,V>, AbstractHashMap<K, V, This>>
+        implements Iterable<Map.Entry<K, V>> {
     
     @SuppressWarnings("rawtypes")
     private static final Function TO_ENTRY = new Function() {
@@ -33,14 +36,6 @@ public abstract class AbstractHashMap<K, V, This extends AbstractHashMap<K, V, T
         @Override
         public Object apply(Object input) {
             return toEntry((Map.Entry) input);
-        }
-    };
-    
-    @SuppressWarnings("rawtypes")
-    private static final Function TO_MAP_ENTRY = new Function() {
-        @Override
-        public Object apply(Object input) {
-            return (Map.Entry) input;
         }
     };
     
@@ -112,9 +107,16 @@ public abstract class AbstractHashMap<K, V, This extends AbstractHashMap<K, V, T
         return root().find(key) != null;
     }
 
-    @SuppressWarnings("unchecked")
     public Iterator<Map.Entry<K, V>> iterator() {
-        return transform(doIterator(), TO_MAP_ENTRY);
+        return transform(doIterator(), MapUtils.<K, V>mapEntryFunction());
+    }
+
+    public Iterable<K> keys() {
+        return Iterables.transform(this, MapUtils.<K>mapKeyFunction());
+    }
+
+    public Iterable<V> values() {
+        return Iterables.transform(this, MapUtils.<V>mapValueFunction());
     }
     
     
@@ -157,12 +159,7 @@ public abstract class AbstractHashMap<K, V, This extends AbstractHashMap<K, V, T
         @Override
         public Node<K, Entry<K, V>> assocInternal(final UpdateContext<? super Entry<K, V>>  currentContext, final int shift, final int hash, final Entry<K, V> newEntry) {
             if (equal(key, newEntry.key)) {
-                if (equal(value, newEntry.value)) {
-                    currentContext.merge(this, newEntry); 
-                    return this;
-                } else {
-                    return currentContext.merge(this, newEntry) ? newEntry : this;
-                }
+                return currentContext.merge(this, newEntry) ? newEntry : this;
             } else {
                 return split(currentContext, shift, hash, newEntry);
             }

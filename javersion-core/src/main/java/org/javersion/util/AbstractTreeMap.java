@@ -27,18 +27,11 @@ import org.javersion.util.AbstractTreeMap.Node;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 
 public abstract class AbstractTreeMap<K, V, This extends AbstractTreeMap<K, V, This>> 
         extends AbstractRedBlackTree<K, Node<K, V>, This> implements Iterable<Map.Entry<K, V>> {
-    
-    @SuppressWarnings("rawtypes")
-    private static final Function TO_MAP_ENTRY = new Function() {
-        @Override
-        public Object apply(Object input) {
-            return (Map.Entry) input;
-        }
-    };
     
     protected AbstractTreeMap() {
         super();
@@ -120,10 +113,43 @@ public abstract class AbstractTreeMap<K, V, This extends AbstractTreeMap<K, V, T
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
     public Iterator<Map.Entry<K, V>> iterator() {
-        return Iterators.transform(doIterator(root(), true), TO_MAP_ENTRY);
+        return iterator(true);
+    }
+
+    public Iterator<Map.Entry<K, V>> iterator(boolean asc) {
+        return Iterators.transform(doIterator(root(), true), MapUtils.<K, V>mapEntryFunction());
+    }
+    
+    public Iterable<Map.Entry<K, V>> range(K from, K to) {
+        return range(from, true, to, false, true);
+    }
+    
+    public Iterable<Map.Entry<K, V>> range(K from, K to, boolean asc) {
+        return range(from, true, to, false, asc);
+    }
+
+    public Iterable<Map.Entry<K, V>> range(final K from, final boolean fromInclusive, final K to, final boolean toInclusive) {
+        return range(from, fromInclusive, to, toInclusive, true);
+    }
+
+    public Iterable<Map.Entry<K, V>> range(final K from, final boolean fromInclusive, final K to, final boolean toInclusive, final boolean asc) {
+        return new Iterable<Map.Entry<K,V>>() {
+            @Override
+            public Iterator<Entry<K, V>> iterator() {
+                return Iterators.transform(doRangeIterator(root(), asc, from, fromInclusive, to, toInclusive), 
+                        MapUtils.<K, V>mapEntryFunction());
+            }
+        };
+    }
+
+    public Iterable<K> keys() {
+        return Iterables.transform(this, MapUtils.<K>mapKeyFunction());
+    }
+    
+    public Iterable<V> values() {
+        return Iterables.transform(this, MapUtils.<V>mapValueFunction());
     }
 
     public String toString() {

@@ -12,8 +12,8 @@ public class PerfTest {
     private static long start;
     
     public static void main(String[] args) {
-        Integer[] data = sequentialData(10000);
-//        runJaversion(data);
+        Integer[] data = randomData(4000);
+        runJaversion(data);
 //        runJaversionTree(data);
 //        runJaversionMutableTree(data);
 
@@ -24,13 +24,14 @@ public class PerfTest {
     }
     
     private static void runJaversion(Integer[] data) {
+        out.println("Javersion PersistentHashMap");
         PersistentHashMap<Integer, Integer> jmap = PersistentHashMap.empty();
         // warmup
         for (Integer v : data) {
             jmap = jmap.assoc(v, v);
         }
         jmap = null;
-//        System.gc();
+        System.gc();
 
         long begin = System.nanoTime();
         for (int i=1; i <= data.length; i++) {
@@ -39,34 +40,42 @@ public class PerfTest {
             for (int j=0; j < i; j++) {
                 jmap = jmap.assoc(data[j], data[j]);
             }
+            for (int j=0; j < i; j++) {
+                jmap = jmap.dissoc(data[j]);
+            }
             out.println(end());
         }
-        out.println(String.format("Javersion total time: %s", System.nanoTime() - begin));
+        out.println(String.format("\n%s", System.nanoTime() - begin));
     }
     
     private static void runClojure(Integer[] data) {
-        clojure.lang.IPersistentMap cmap = clojure.lang.PersistentHashMap.EMPTY;
+        out.println("Clojure PersistentHashMap");
+        clojure.lang.PersistentHashMap cmap = clojure.lang.PersistentHashMap.EMPTY;
 
         // warmup
         for (Integer v : data) {
-            cmap = cmap.assoc(v, v);
+            cmap = (clojure.lang.PersistentHashMap) cmap.assoc(v, v);
         }
         cmap = null;
-//        System.gc();
+        System.gc();
         
         long begin = System.nanoTime();
         for (int i=1; i <= data.length; i++) {
             start();
             cmap = clojure.lang.PersistentHashMap.EMPTY;
             for (int j=0; j < i; j++) {
-                cmap = cmap.assoc(data[j], data[j]);
+                cmap = (clojure.lang.PersistentHashMap) cmap.assoc(data[j], data[j]);
+            }
+            for (int j=0; j < i; j++) {
+                cmap = (clojure.lang.PersistentHashMap) cmap.without(data[j]);
             }
             out.println(end());
         }
-        out.println(String.format("Clojure total time: %s", System.nanoTime() - begin));
+        out.println(String.format("\n%s", System.nanoTime() - begin));
     }
     
     private static void runJaversionTree(Integer[] data) {
+        out.println("Javersion PersistentTreeMap");
         @SuppressWarnings("unchecked")
         PersistentTreeMap<Integer, Integer> jmap = PersistentTreeMap.EMPTY;
         // warmup
@@ -83,12 +92,16 @@ public class PerfTest {
             for (int j=0; j < i; j++) {
                 jmap = jmap.assoc(data[j], data[j]);
             }
+            for (int j=0; j < i; j++) {
+                jmap = jmap.dissoc(data[j]);
+            }
             out.println(end());
         }
-        out.println(String.format("Javersion total time: %s", System.nanoTime() - begin));
+        out.println(String.format("\nJaversion total time: %s", System.nanoTime() - begin));
     }
     
     private static void runJaversionMutableTree(Integer[] data) {
+        out.println("Javersion MutableTreeMap");
         MutableTreeMap<Integer, Integer> jmap = new MutableTreeMap<>();
         // warmup
         for (Integer v : data) {
@@ -104,12 +117,16 @@ public class PerfTest {
             for (int j=0; j < i; j++) {
                 jmap.put(data[j], data[j]);
             }
+            for (int j=0; j < i; j++) {
+                jmap.remove(data[j]);
+            }
             out.println(end());
         }
-        out.println(String.format("Javersion total time: %s", System.nanoTime() - begin));
+        out.println(String.format("\n%s", System.nanoTime() - begin));
     }
     
     private static void runJavaTree(Integer[] data) {
+        out.println("Java TreeMap");
         TreeMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
         // warmup
         for (Integer v : data) {
@@ -125,12 +142,16 @@ public class PerfTest {
             for (int j=0; j < i; j++) {
                 map.put(data[j], data[j]);
             }
+            for (int j=0; j < i; j++) {
+                map.remove(data[j]);
+            }
             out.println(end());
         }
-        out.println(String.format("Java total time: %s", System.nanoTime() - begin));
+        out.println(String.format("\n%s", System.nanoTime() - begin));
     }
     
     private static void runClojureTree(Integer[] data) {
+        out.println("Clojure PersistentTreeMap");
         clojure.lang.PersistentTreeMap cmap = clojure.lang.PersistentTreeMap.EMPTY;
         
         // warmup
@@ -147,9 +168,12 @@ public class PerfTest {
             for (int j=0; j < i; j++) {
                 cmap = cmap.assoc(data[j], data[j]);
             }
+            for (int j=0; j < i; j++) {
+                cmap = cmap.without(data[j]);
+            }
             out.println(end());
         }
-        out.println(String.format("Clojure total time: %s", System.nanoTime() - begin));
+        out.println(String.format("\n%s", System.nanoTime() - begin));
     }
 
     private static void start() {
@@ -159,7 +183,7 @@ public class PerfTest {
         return System.nanoTime() - start;
     }
     
-    private static final Random RANDOM = new Random(1234567);
+    private static final Random RANDOM = new Random();
     
     public static Integer[] sequentialData(int length) {
         Integer[] data = new Integer[length];

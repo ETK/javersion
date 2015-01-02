@@ -18,12 +18,18 @@ package org.javersion.reflect;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -42,6 +48,11 @@ public class TypeDescriptorTest {
 
     public static class Cycle {
         Cycle cycle;
+    }
+    
+    public static class Generic {
+        Map<String, Long> map;
+        Map<String, Map<String, Long>> mapOfMaps;
     }
     
     private final Class<?>[] expectedSuperClasses = {
@@ -92,6 +103,18 @@ public class TypeDescriptorTest {
         
         assertThat(type, equalTo(fieldType));
         assertThat(field, equalTo(fieldTypeField));
+    }
+    
+    @Test
+    public void Generic_Identity() {
+        TypeDescriptor type = TYPES.get(Generic.class);
+        FieldDescriptor mapField = type.getField("map");
+        FieldDescriptor mapOfMapsField = type.getField("mapOfMaps");
+        
+        assertThat(mapField.getType(), not(equalTo(mapOfMapsField.getType())));
+        
+        TypeDescriptor mapOfMapsValueType = mapOfMapsField.getType().resolveGenericParameter(Map.class, 1);
+        assertThat(mapField.getType(), equalTo(mapOfMapsValueType));
     }
     
     @Test(expected=RuntimeException.class)
